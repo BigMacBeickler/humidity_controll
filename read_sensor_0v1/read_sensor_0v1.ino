@@ -97,7 +97,7 @@ void setup() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
-
+delay(5000);
   if (werte.size() >= 10) {
     werte.erase(werte.begin(), werte.begin() + 2);             // Trimm length of vector to 10 data points
   }
@@ -181,5 +181,5 @@ void loop() {
     Serial.println(client_was_here);
   #endif
 
-  delay(5000);
+  //delay(5000);
 }
