@@ -16,7 +16,7 @@
 byte mac[] = {
   0x30, 0x43, 0xA7, 0xC8, 0x78, 0x1E
 };
-IPAddress ip(172, 16, 60, 101); //trockenschrank 1
+IPAddress ip(192, 168, 1, 2); //trockenschrank 1
 EthernetServer server(80);
 
 
@@ -97,7 +97,7 @@ void setup() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop() {
-delay(5000);
+delay(500);
   if (werte.size() >= 10) {
     werte.erase(werte.begin(), werte.begin() + 2);             // Trimm length of vector to 10 data points
   }
@@ -112,9 +112,9 @@ delay(5000);
     i--;
     for(int n = 0; n < 5; n++){
         digitalWrite(LED_BUILTIN, HIGH);
-        delay(250);
+        delay(150);
         digitalWrite(LED_BUILTIN, LOW);
-        delay(250);
+        delay(150);
     }
   }
 
@@ -138,7 +138,7 @@ delay(5000);
   if (client) {
     
     #ifdef DEBUG
-    client_was_here = true;
+      client_was_here = true;
     #endif
 
     bool currentLineIsBlank = true;
@@ -150,7 +150,7 @@ delay(5000);
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println("Connection: close");                 // the connection will be closed after completion of the response
-          client.println("Refresh: 5");                        // refresh the page automatically every 5 sec
+          client.println("Refresh: 2");                        // refresh the page automatically every x seconds
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
