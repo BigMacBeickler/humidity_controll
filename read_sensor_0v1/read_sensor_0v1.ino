@@ -16,7 +16,7 @@
 byte mac[] = {
   0x30, 0x43, 0xA7, 0xC8, 0x78, 0x1E
 };
-IPAddress ip(192, 168, 1, 2);
+IPAddress ip(172, 16, 60, 101); //trockenschrank 1
 EthernetServer server(80);
 
 
@@ -51,8 +51,10 @@ void hum_average() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void setup() {
 
-  #ifdef DEBUG
-    Serial.begin(9600);                                        //time for serial monitor to kick in  
+
+
+  #ifdef DEBUG  
+    Serial.begin(9600);                                      //time for serial monitor to kick in  
     delay(5000);
     Serial.println(client_was_here);
   #endif
@@ -89,6 +91,7 @@ void setup() {
   
   server.begin();       //start server
   dht.begin();          //start dht instance
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 
@@ -107,6 +110,12 @@ void loop() {
     werte.push_back(hum);
     i = werte.end();
     i--;
+    for(int n = 0; n < 5; n++){
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(250);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(250);
+    }
   }
 
   #ifdef DEBUG
