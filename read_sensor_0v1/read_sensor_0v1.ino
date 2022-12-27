@@ -9,7 +9,7 @@
 #include <Ethernet.h>
 
 
-#define DEBUG
+//#define DEBUG
 
 
 // Network config//
@@ -134,12 +134,14 @@ delay(500);
   } else {
     Serial.println("Most likely networkcabel");
   }
+   time = millis();
   #endif
 
-  time = millis();
   EthernetClient client = server.available();
   while(!client){
+  #ifdef DEBUG
     Serial.println("Ich war hier");
+  #endif
     delay(250);
     EthernetClient client = server.available();
     if(client){
@@ -148,9 +150,11 @@ delay(500);
     //client==true ? break : continue;
   };                  //listen for incoming clients
 
+#ifdef DEBUG
   Serial.println("Time passed since started to listen for clients");
   Serial.println(millis()-time);
-  
+#endif  
+
   if (client) {
     
     #ifdef DEBUG
