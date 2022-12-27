@@ -9,7 +9,7 @@
 #include <Ethernet.h>
 
 
-//#define DEBUG
+#define DEBUG
 
 
 // Network config//
@@ -32,6 +32,8 @@ bool error = false;
 std::vector<float> werte;
 std::vector<float>::iterator i;
 
+//timer
+unsigned long time;
 
 #ifdef DEBUG
 bool client_was_here = false;
@@ -134,7 +136,21 @@ delay(500);
   }
   #endif
 
-  EthernetClient client = server.available();                  //listen for incoming clients
+  time = millis();
+  EthernetClient client = server.available();
+  while(!client){
+    Serial.println("Ich war hier");
+    delay(250);
+    EthernetClient client = server.available();
+    if(client){
+      break;
+    }
+    //client==true ? break : continue;
+  };                  //listen for incoming clients
+
+  Serial.println("Time passed since started to listen for clients");
+  Serial.println(millis()-time);
+  
   if (client) {
     
     #ifdef DEBUG
