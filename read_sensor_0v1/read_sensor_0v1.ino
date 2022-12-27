@@ -166,7 +166,7 @@ delay(500);
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println("Connection: close");                 // the connection will be closed after completion of the response
-          client.println("Refresh: 2");                        // refresh the page automatically every x seconds
+          //client.println("Refresh: 2");                        // refresh the page automatically every x seconds
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
