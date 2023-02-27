@@ -9,15 +9,17 @@
 #include <Ethernet.h>
 
 
-//#define DEBUG
+#define DEBUG
+
 
 
 // Network config//
 byte mac[] = {
-  0x30, 0x43, 0xA7, 0xC8, 0x78, 0x1E
+  0x30, 0x43, 0xA7, 0xC8, 0x78, 0x2E
 };
-IPAddress ip(192, 168, 1, 2);  //trockenschrank 1
+IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet
 EthernetServer server(80);
+bool dhcp = true;
 
 
 // Sensor config
@@ -63,7 +65,11 @@ void setup() {
 #endif
 
   Ethernet.init(17);        //Use pin 17 for CS
-  Ethernet.begin(mac, ip);  //Start an Ethernet object
+  if(dhcp == true){
+    Ethernet.begin(mac);    //Startz an ehternet object in dhcp mode
+  }else{
+    Ethernet.begin(mac, ip);  //Start an ethernet object without dhcp
+  }
   delay(500);
 
 #ifdef DEBUG
