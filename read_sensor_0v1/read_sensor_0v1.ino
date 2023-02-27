@@ -9,7 +9,7 @@
 #include <Ethernet.h>
 
 
-#define DEBUG
+//#define DEBUG
 
 
 
@@ -19,7 +19,7 @@ byte mac[] = {
 };
 IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet
 EthernetServer server(80);
-bool dhcp = true;
+bool dhcp = true;               // true if dhcp is to be used
 
 
 // Sensor config
@@ -30,6 +30,7 @@ DHT dht(DHTPIN, DHTTYPE);  //creates DHT object
 
 //value storage
 float hum;
+int iDHCP_configured = 0;
 bool error = false;
 std::vector<float> werte;
 std::vector<float>::iterator i;
@@ -66,7 +67,14 @@ void setup() {
 
   Ethernet.init(17);        //Use pin 17 for CS
   if(dhcp == true){
-    Ethernet.begin(mac);    //Startz an ehternet object in dhcp mode
+    while(iDHCP_configured != 1){
+      iDHCP_configured = Ethernet.begin(mac);    //Startz an ehternet object in dhcp mode
+      //Ethernet.begin(mac);
+        #ifdef DEBUG
+        Serial.println(iDHCP_configured);
+        Serial.println("i tried to dhcp");
+        #endif
+    }
   }else{
     Ethernet.begin(mac, ip);  //Start an ethernet object without dhcp
   }
@@ -202,7 +210,7 @@ void loop() {
 #endif
 
   client.stop();
-
+  Ethernet.maintain();      //function to renew dhcp lease. In this case probably not needed
 #ifdef DEBUG
   Serial.println(client_was_here);
 #endif
