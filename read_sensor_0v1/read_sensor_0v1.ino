@@ -11,16 +11,15 @@
 
 //#define DEBUG
 
-
-
 // Network config//
 byte mac[] = {
   0x30, 0x43, 0xA7, 0xC8, 0x78, 0x2E
 };
-IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet
 EthernetServer server(80);
 bool dhcp = true;               // true if dhcp is to be used
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet!!!!
 
 // Sensor config
 #define DHTPIN 2           //Input pin
