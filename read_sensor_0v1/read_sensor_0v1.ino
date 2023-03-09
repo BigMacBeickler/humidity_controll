@@ -1,7 +1,9 @@
+//for W5100S-EVB-Pico
 //replace standart arduino ethernet library with
 //this one https://github.com/WIZnet-ArduinoEthernet/Ethernet
 //for this to work
-//set values for IP address and MAC address
+//if dhcp off set values for IP address and MAC address
+//else only MAC address
 
 #include <DHT.h>
 #include <vector>
