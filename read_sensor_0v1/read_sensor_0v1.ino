@@ -29,6 +29,10 @@ IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet!!!!
 DHT dht(DHTPIN, DHTTYPE);  //creates DHT object
 
 
+#ifdef DEBUG
+//Debugtimer
+unsigned long time;
+
 //value storage
 float hum;
 int iDHCP_configured = 0;
@@ -36,15 +40,7 @@ bool error = false;
 std::vector<float> werte;
 std::vector<float>::iterator i;
 
-
-//timer
-unsigned long time;
-
-
-#ifdef DEBUG
 bool client_was_here = false;
-#endif  // DEBUG
-
 
 void hum_average() {
   float avr = 0;
@@ -55,7 +51,7 @@ void hum_average() {
   Serial.print("Average Humidity: ");
   Serial.println(avr);
 }
-
+#endif  // DEBUG
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,11 +61,10 @@ void setup() {
   delay(5000);
   Serial.println(client_was_here);
 #endif
-
   Ethernet.init(17);        //Use pin 17 for CS
   if(dhcp == true){
     while(iDHCP_configured != 1){
-      iDHCP_configured = Ethernet.begin(mac);    //Startz an ehternet object in dhcp mode
+      iDHCP_configured = Ethernet.begin(mac);    //Starts an ethernet object in dhcp mode
       //Ethernet.begin(mac);
         #ifdef DEBUG
         Serial.println(iDHCP_configured);
@@ -77,10 +72,9 @@ void setup() {
         #endif
     }
   }else{
-    Ethernet.begin(mac, ip);  //Start an ethernet object without dhcp
+    Ethernet.begin(mac, ip);  //Starts an ethernet object without dhcp
   }
   delay(500);
-
 #ifdef DEBUG
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {  //Check for networkhardware, if nothing, wait 1 second
     Serial.println("No Networkhardware found");
@@ -103,7 +97,6 @@ void setup() {
     delay(2000);
   }
 #endif
-
   server.begin();  //start server
   dht.begin();     //start dht instance
   pinMode(LED_BUILTIN, OUTPUT);
@@ -111,13 +104,16 @@ void setup() {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Loop waits 500ms, then reads the sensor. Create a client object if one is connected. If no client is connected it entwers a while loop which breaks after a client connects per ethernet.
 void loop() {
   delay(500);
+#ifdef DEBUG
   if (werte.size() >= 10) {
     werte.erase(werte.begin(), werte.begin() + 2);  // Trimm length of vector to 10 data points
   }
-
+#endif
   hum = dht.readHumidity();  //Read data and store it to variable hum
+#ifdef DEBUG
   if (hum != hum) {
     error = true;
   } else {
@@ -133,7 +129,6 @@ void loop() {
     }
   }
 
-#ifdef DEBUG
   if (error) {
     Serial.println("could not read data from sensor");
   } else {
@@ -149,7 +144,6 @@ void loop() {
   }
   time = millis();
 #endif
-
   EthernetClient client = server.available();
   while (!client) {
 #ifdef DEBUG
@@ -162,20 +156,14 @@ void loop() {
     }
     //client==true ? break : continue;
   };  //listen for incoming clients
-
-
 #ifdef DEBUG
   Serial.println("Time passed since started to listen for clients");
   Serial.println(millis() - time);
 #endif
-
-
   if (client) {
-
 #ifdef DEBUG
     client_was_here = true;
 #endif
-
     bool currentLineIsBlank = true;
     while (client.connected()) {
       if (client.available()) {
@@ -203,18 +191,15 @@ void loop() {
     }
     delay(50);  // give the web browser time to receive the data
   }
-
 #ifdef DEBUG
   else {
     client_was_here = false;
   }
 #endif
-
   client.stop();
   Ethernet.maintain();      //function to renew dhcp lease. In this case probably not needed
 #ifdef DEBUG
   Serial.println(client_was_here);
 #endif
-
   //delay(5000);
 }
