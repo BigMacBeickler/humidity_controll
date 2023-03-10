@@ -2,6 +2,7 @@
 //replace standart arduino ethernet library with
 //this one https://github.com/WIZnet-ArduinoEthernet/Ethernet
 //for this to work
+
 //if dhcp off set values for IP address and MAC address
 //else only MAC address
 
@@ -19,24 +20,24 @@ byte mac[] = {
 };
 EthernetServer server(80);
 bool dhcp = true;               // true if dhcp is to be used
+int iDHCP_configured = 0;
+bool error = false;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-IPAddress ip(172, 60, 48, 61);  // ip benötigt falls kein dhcp verwendet!!!!
+IPAddress ip(172, 60, 48, 256);  // ip benötigt falls kein dhcp verwendet!!!!
 
 // Sensor config
 #define DHTPIN 2           //Input pin
 #define DHTTYPE DHT22      //Sensor type
 DHT dht(DHTPIN, DHTTYPE);  //creates DHT object
+float hum;
 
 
 #ifdef DEBUG
 //Debugtimer
-unsigned long time;
+unsigned long ltime;
 
 //value storage
-float hum;
-int iDHCP_configured = 0;
-bool error = false;
 std::vector<float> werte;
 std::vector<float>::iterator i;
 
@@ -66,10 +67,10 @@ void setup() {
     while(iDHCP_configured != 1){
       iDHCP_configured = Ethernet.begin(mac);    //Starts an ethernet object in dhcp mode
       //Ethernet.begin(mac);
-        #ifdef DEBUG
-        Serial.println(iDHCP_configured);
-        Serial.println("i tried to dhcp");
-        #endif
+#ifdef DEBUG
+Serial.println(iDHCP_configured);
+Serial.println("i tried to dhcp");
+#endif
     }
   }else{
     Ethernet.begin(mac, ip);  //Starts an ethernet object without dhcp
@@ -95,6 +96,7 @@ void setup() {
   }
   while (Ethernet.linkStatus() != LinkON) {
     delay(2000);
+    Serial.println("Waiting for network cable");
   }
 #endif
   server.begin();  //start server
@@ -113,6 +115,11 @@ void loop() {
   }
 #endif
   hum = dht.readHumidity();  //Read data and store it to variable hum
+  if (hum != hum) {
+    error = true;
+  } else {
+    error = false;
+  }
 #ifdef DEBUG
   if (hum != hum) {
     error = true;
@@ -142,7 +149,7 @@ void loop() {
   } else {
     Serial.println("Most likely networkcabel");
   }
-  time = millis();
+  ltime = millis();
 #endif
   EthernetClient client = server.available();
   while (!client) {
@@ -158,7 +165,7 @@ void loop() {
   };  //listen for incoming clients
 #ifdef DEBUG
   Serial.println("Time passed since started to listen for clients");
-  Serial.println(millis() - time);
+  Serial.println(millis() - ltime);
 #endif
   if (client) {
 #ifdef DEBUG
@@ -177,7 +184,7 @@ void loop() {
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
-          error == false ? client.print(*i) : client.print("NAN");  //writing the value
+          error == false ? client.print(hum) : client.print("NAN");  //writing the value
           client.println("<br />");
           client.println("</html>");
           break;
