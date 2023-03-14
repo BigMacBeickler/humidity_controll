@@ -24,7 +24,7 @@ int iDHCP_configured = 0;
 bool error = false;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-IPAddress ip(172, 60, 48, 256);  // ip benötigt falls kein dhcp verwendet!!!!
+IPAddress ip(172, 60, 48, 255);  // ip benötigt falls kein dhcp verwendet!!!!
 
 // Sensor config
 #define DHTPIN 2           //Input pin
@@ -34,16 +34,16 @@ float hum;
 
 
 #ifdef DEBUG
-//Debugtimer
-unsigned long ltime;
+  //Debugtimer
+  unsigned long ltime;
 
-//value storage
-std::vector<float> werte;
-std::vector<float>::iterator i;
+  //value storage
+  std::vector<float> werte;
+  std::vector<float>::iterator i;
 
-bool client_was_here = false;
+  bool client_was_here = false;
 
-void hum_average() {
+  void hum_average() {
   float avr = 0;
   for (int n = 0; n < werte.size(); n++) {
     avr += werte[n];
@@ -51,10 +51,17 @@ void hum_average() {
   avr = avr / werte.size();
   Serial.print("Average Humidity: ");
   Serial.println(avr);
-}
+  }
 #endif  // DEBUG
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void reset(){
+  digitalWrite(0, HIGH);
+  delay(1000);
+  digitalWrite(0, LOW);
+  delay(1000);
+}
 
 void setup() {
 #ifdef DEBUG
@@ -68,8 +75,8 @@ void setup() {
       iDHCP_configured = Ethernet.begin(mac);    //Starts an ethernet object in dhcp mode
       //Ethernet.begin(mac);
 #ifdef DEBUG
-Serial.println(iDHCP_configured);
-Serial.println("i tried to dhcp");
+  Serial.println(iDHCP_configured);
+  Serial.println("i tried to dhcp");
 #endif
     }
   }else{
@@ -102,6 +109,7 @@ Serial.println("i tried to dhcp");
   server.begin();  //start server
   dht.begin();     //start dht instance
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(0, OUTPUT);
 }
 
 
@@ -117,12 +125,13 @@ void loop() {
   hum = dht.readHumidity();  //Read data and store it to variable hum
   if (hum != hum) {
     error = true;
+    reset();
   } else {
     error = false;
   }
 #ifdef DEBUG
   if (hum != hum) {
-    error = true;
+    error = true;    
   } else {
     error = false;  //reset error flag
     werte.push_back(hum);
