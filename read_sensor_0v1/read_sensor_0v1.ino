@@ -1,9 +1,9 @@
-//for W5100S-EVB-Pico
+//only for W5100S-EVB-Pico
 //replace standart arduino ethernet library with
 //this one https://github.com/WIZnet-ArduinoEthernet/Ethernet
 //for this to work
 
-//if dhcp off set values for IP address and MAC address
+//if dhcp off, set values for IP address and MAC address
 //else only MAC address
 
 #include <DHT.h>
@@ -16,7 +16,7 @@
 
 // Network config//
 byte mac[] = {
-  0x30, 0x43, 0xA7, 0xC8, 0x78, 0x2E
+  0x30, 0x43, 0xA7, 0xC8, 0x78, 0x5E
 };
 EthernetServer server(80);
 bool dhcp = true;               // true if dhcp is to be used
@@ -24,7 +24,7 @@ int iDHCP_configured = 0;
 bool error = false;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-IPAddress ip(172, 60, 48, 255);  // ip benötigt falls kein dhcp verwendet!!!!
+IPAddress ip(192, 1, 1, 1);  // ip benötigt falls kein dhcp verwendet!!!!
 
 // Sensor config
 #define DHTPIN 2           //Input pin
@@ -69,7 +69,7 @@ void setup() {
   delay(5000);
   Serial.println(client_was_here);
 #endif
-  Ethernet.init(17);        //Use pin 17 for CS
+  Ethernet.init(17);        //Pin 17 is CS
   if(dhcp == true){
     while(iDHCP_configured != 1){
       iDHCP_configured = Ethernet.begin(mac);    //Starts an ethernet object in dhcp mode
@@ -114,7 +114,7 @@ void setup() {
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Loop waits 500ms, then reads the sensor. Create a client object if one is connected. If no client is connected it entwers a while loop which breaks after a client connects per ethernet.
+//Loop waits 500ms, then reads the sensor. Create a client object if one is connected. If no client is connected it enters a while loop which breaks after a client connects per ethernet.
 void loop() {
   delay(500);
 #ifdef DEBUG
@@ -122,8 +122,8 @@ void loop() {
     werte.erase(werte.begin(), werte.begin() + 2);  // Trimm length of vector to 10 data points
   }
 #endif
-  hum = dht.readHumidity();  //Read data and store it to variable hum
-  if (hum != hum) {
+  hum = dht.readHumidity();   //Read data and store it to variable hum
+  if (hum != hum) {           //Check if data could be read, if not, do sensor reset routine. Needs the reset board extension
     error = true;
     reset();
   } else {
